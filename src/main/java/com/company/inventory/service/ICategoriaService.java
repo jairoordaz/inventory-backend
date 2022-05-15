@@ -14,4 +14,6 @@ public interface ICategoriaService {
 	public Respuesta<Categoria> updateCategoria(Categoria categoria,Long id);
 	
 	public Respuesta<List<Categoria>> buscar();
+	
+	public Respuesta<Categoria> borrar(Long id);
 }

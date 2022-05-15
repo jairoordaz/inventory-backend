@@ -104,6 +104,22 @@ public class CategoriaServiceImpl implements ICategoriaService{
 		return response;
 	}
 	
+	@Override
+	@Transactional
+	public Respuesta<Categoria> borrar(Long id){
+		Respuesta<Categoria> response = new Respuesta<>();
+		try {
+			dao.deleteById(id);
+			response.setResultset(null);
+			response.setStatuscode(Constantes.REQUEST_EXITOSO);
+			response.setStatus(Constantes.HTTP_STATUS_200);
+		}catch(Exception e) {
+			response.setStatuscode(Constantes.REQUEST_FALLIDO);
+		}
+		
+		return response;
+	}
+	
 	
 
 }
