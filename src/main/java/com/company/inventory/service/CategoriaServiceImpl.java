@@ -1,92 +1,85 @@
 package com.company.inventory.service;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.company.inventory.dao.ICategoriaDao;
 import com.company.inventory.model.Categoria;
-import com.company.inventory.response.CategoriaResponseRest;
+import com.company.inventory.model.Respuesta;
+import com.company.inventory.util.Constantes;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 @Service
 public class CategoriaServiceImpl implements ICategoriaService{
 	
 	@Autowired 
 	private ICategoriaDao dao;
-
-	@Transactional(readOnly = true)
-	public ResponseEntity<CategoriaResponseRest> search() {
-		CategoriaResponseRest response = new CategoriaResponseRest();
+	
+	public Respuesta<List<Categoria>> buscar(){
+		Respuesta<List<Categoria>> categoria = new Respuesta<>();
 		try {
-			List<Categoria> categoria = (List<Categoria>) dao.findAll();
-			response.getCategoriaResponse().setCategoria(categoria);
-			response.setMetadata("Respuesta Ok", "00", "Respuesta Existosa");
+			categoria.setResultset((List<Categoria>) dao.findAll());
+			categoria.setStatuscode(Constantes.REQUEST_EXITOSO);
+			categoria.setStatus(Constantes.HTTP_STATUS_200);
 		}catch(Exception e) {
-			response.setMetadata("Respuesta Invalida", "-1", "Error al consultar" + e.getMessage());
-			return new ResponseEntity<CategoriaResponseRest>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error(e);
+			categoria.setStatuscode(Constantes.REQUEST_FALLIDO);
 		}
-		
-		return new ResponseEntity<CategoriaResponseRest>(response,HttpStatus.OK);
+		return categoria;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public ResponseEntity<CategoriaResponseRest> searchById(Long id) {
-		CategoriaResponseRest response = new CategoriaResponseRest();
-		List<Categoria> list = new ArrayList<>();
+	public Respuesta<Categoria> searchById(Long id) {
+		Respuesta<Categoria> response = new Respuesta<>();
 		try {
 			Optional<Categoria> categoria = dao.findById(id);
 			if(categoria.isPresent()) {
-				list.add(categoria.get());
-				response.getCategoriaResponse().setCategoria(list);
-				response.setMetadata("Respuesta Ok", "00", "Categoria encontrada");
+				response.setResultset(categoria.get());
+				response.setStatuscode(Constantes.REQUEST_EXITOSO);
+				response.setStatus(Constantes.HTTP_STATUS_200);
 			}else {
-				response.setMetadata("Respuesta Invalida", "-1", "Categoria no encontrada");
-				return new ResponseEntity<CategoriaResponseRest>(response,HttpStatus.NOT_FOUND);
+				response.setStatuscode(Constantes.REQUEST_FALLIDO);
 			}
 		}catch(Exception e) {
-			response.setMetadata("Respuesta Invalida", "-1", "Error al consultar por Id" + e.getMessage());
-			return new ResponseEntity<CategoriaResponseRest>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+			response.setStatuscode(Constantes.REQUEST_FALLIDO);
 		}
-		
-		return new ResponseEntity<CategoriaResponseRest>(response,HttpStatus.OK);
+		return response;
 	}
 
 	@Override
 	@Transactional
-	public ResponseEntity<CategoriaResponseRest> saveCategoria(Categoria categoria) {
-		CategoriaResponseRest response = new CategoriaResponseRest();
-		List<Categoria> list = new ArrayList<>();
+	public Respuesta<Categoria> saveCategoria(Categoria categoria) {
+		Respuesta<Categoria> response = new Respuesta<>();
 		try {
 			Categoria categoriaSave = dao.save(categoria);
 			if(categoriaSave != null) {
-				list.add(categoriaSave);
-				response.getCategoriaResponse().setCategoria(list);
-				response.setMetadata("Respuesta Ok", "00", "Categoria guardada exitosamente");
+				response.setResultset(categoria);
+				response.setStatuscode(Constantes.REQUEST_EXITOSO);
+				response.setStatus(Constantes.HTTP_STATUS_200);
 			}else {
-				response.setMetadata("Respuesta Invalida", "-1", "Categoria no guardada");
-				return new ResponseEntity<CategoriaResponseRest>(response,HttpStatus.BAD_REQUEST);
+				response.setStatuscode(Constantes.REQUEST_EXITOSO);
 			}
 			
 		}catch(Exception e) {
-			response.setMetadata("Respuesta Invalida", "-1", "Error al guardar categoria" + e.getMessage());
-			return new ResponseEntity<CategoriaResponseRest>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error(e);
+			response.setStatuscode(Constantes.REQUEST_EXITOSO);
 		}
 		
-		return new ResponseEntity<CategoriaResponseRest>(response,HttpStatus.OK);
+		return response;
 	}
 
 	@Override
 	@Transactional
-	public ResponseEntity<CategoriaResponseRest> updateCategoria(Categoria categoria,Long id) {
-		CategoriaResponseRest response = new CategoriaResponseRest();
-		List<Categoria> list = new ArrayList<>();
+	public Respuesta<Categoria> updateCategoria(Categoria categoria,Long id) {
+		Respuesta<Categoria> response = new Respuesta<>();
 		try {
 			Optional<Categoria> categoriaSearch = dao.findById(id);
 			if(categoriaSearch.isPresent()) {
@@ -94,24 +87,23 @@ public class CategoriaServiceImpl implements ICategoriaService{
 				categoriaSearch.get().setDescripcion(categoria.getDescripcion());
 				Categoria categoriaToUpdate = dao.save(categoriaSearch.get());
 				if(categoriaToUpdate != null) {
-					list.add(categoriaToUpdate);
-					response.getCategoriaResponse().setCategoria(list);
-					response.setMetadata("Respuesta Ok", "00", "Categoria actualizada exitosamente");
+					response.setResultset(categoriaToUpdate);
+					response.setStatuscode(Constantes.REQUEST_EXITOSO);
+					response.setStatus(Constantes.HTTP_STATUS_200);
 				}else {
-					response.setMetadata("Respuesta Invalida", "-1", "Error al actualizar categoria");
-					return new ResponseEntity<CategoriaResponseRest>(response,HttpStatus.BAD_REQUEST);
+					response.setStatuscode(Constantes.REQUEST_FALLIDO);
 				}
 			}else {
-				response.setMetadata("Respuesta Invalida", "-1", "Categoria no encontrada");
-				return new ResponseEntity<CategoriaResponseRest>(response,HttpStatus.NOT_FOUND);
+				response.setStatuscode(Constantes.REQUEST_FALLIDO);
 			}
 			
 		}catch(Exception e) {
-			response.setMetadata("Respuesta Invalida", "-1", "Error al actualizar categoria" + e.getMessage());
-			return new ResponseEntity<CategoriaResponseRest>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error(e);
+			response.setStatuscode(Constantes.REQUEST_FALLIDO);
 		}
-		
-		return new ResponseEntity<CategoriaResponseRest>(response,HttpStatus.OK);
+		return response;
 	}
+	
+	
 
 }

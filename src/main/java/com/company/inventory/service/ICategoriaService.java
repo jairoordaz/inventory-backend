@@ -1,17 +1,17 @@
 package com.company.inventory.service;
 
-import org.springframework.http.ResponseEntity;
+import java.util.List;
 
 import com.company.inventory.model.Categoria;
-import com.company.inventory.response.CategoriaResponseRest;
+import com.company.inventory.model.Respuesta;
 
 public interface ICategoriaService {
 	
-	public ResponseEntity<CategoriaResponseRest> search();
+	public Respuesta<Categoria> searchById(Long id);
 	
-	public ResponseEntity<CategoriaResponseRest> searchById(Long id);
+	public Respuesta<Categoria> saveCategoria(Categoria categoria);
 	
-	public ResponseEntity<CategoriaResponseRest> saveCategoria(Categoria categoria);
+	public Respuesta<Categoria> updateCategoria(Categoria categoria,Long id);
 	
-	public ResponseEntity<CategoriaResponseRest> updateCategoria(Categoria categoria,Long id);
+	public Respuesta<List<Categoria>> buscar();
 }
