@@ -49,7 +49,6 @@ public class CategoriaServiceImpl implements ICategoriaService{
 				response.setStatuscode(Constantes.REQUEST_FALLIDO);
 			}
 		}catch(Exception e) {
-			
 			response.setStatuscode(Constantes.REQUEST_FALLIDO);
 		}
 		return response;
